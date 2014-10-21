@@ -99,7 +99,10 @@ class NDB_Form_user_accounts extends NDB_Form
 	        $values['Password_md5'] = User::newPassword();
             $values['Password_expiry'] = '0000-00-00';
             unset($values['NA_Password']);
-	    }
+        // if password field not empty then extend password expiry
+	    } elseif (empty($values['NA_Password']) && !empty($values['Password_md5'])) {
+                $values['Password_expiry'] = date('Y-m-d', mktime(0, 0, 0, date('n') + 6, date('j'), date('Y')));
+            }
 
         // make the set
         foreach ($values as $key => $value) {
@@ -120,7 +123,6 @@ class NDB_Form_user_accounts extends NDB_Form
         if (isset($set['Password_md5'])) {
             $set['Password_md5'] = User::md5_salt($set['Password_md5']);
         }
-
 
         // update the user
         if (empty($this->identifier)) {
