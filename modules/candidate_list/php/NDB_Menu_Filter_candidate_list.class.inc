@@ -1,6 +1,6 @@
 <?php
 require_once 'NDB_Menu_Filter.class.inc';
-require_once '../modules/candidate_parameters/php/NDB_Form_candidate_parameters.class.inc';
+require_once '../modules/participant_status/php/NDB_Form_participant_status.class.inc';
 /**
 * The candidate list menu
  * @package main
@@ -68,7 +68,7 @@ class NDB_Menu_Filter_candidate_list extends NDB_Menu_Filter
          LEFT JOIN feedback_bvl_thread ON (candidate.CandID=feedback_bvl_thread.CandID)
          LEFT JOIN participant_status ON (participant_status.CandID=candidate.CandID)
          LEFT JOIN participant_status_options ON (participant_status.participant_status=participant_status_options.ID)
-        WHERE candidate.CenterID = psc.CenterID AND candidate.Entity_type = 'Human' AND candidate.Active = 'Y'";
+        WHERE candidate.CenterID = psc.CenterID AND candidate.Active = 'Y'";
         $user =& User::singleton();
         if (!$user->hasPermission('access_all_profiles')) {
             $this->query .= " AND candidate.CenterID=" . $user->getCenterID();
@@ -134,7 +134,7 @@ class NDB_Menu_Filter_candidate_list extends NDB_Menu_Filter
         $latest_visit_status_options = array(null => 'All', 'Not Started' => 'Not Started', 'Screening' => 'Screening', 'Visit' => 'Visit', 'Approval' => 'Approval',
                                             /* 'Subject' => 'Subject', */'Recycling Bin' => 'Recycling Bin');
     
-        $participant_status_options=   array(null=>'All') +  NDB_Form_candidate_parameters::getParticipantStatusOptions();
+        $participant_status_options=   array(null=>'All') +  NDB_Form_participant_status::getParticipantStatusOptions();
         $scan_options = array(null=>'All','Y'=>'Yes','N'=>'No');
         // add form elements
         $this->addSelect('centerID', 'Site:', $list_of_sites);
@@ -171,7 +171,7 @@ class NDB_Menu_Filter_candidate_list extends NDB_Menu_Filter
         }
 		$subprojectlist=Utility::getSubprojectList();
         $projectlist=Utility::getProjectList();
-        $participantOptions= NDB_Form_candidate_parameters::getParticipantStatusOptions();
+        $participantOptions= NDB_Form_participant_status::getParticipantStatusOptions();
         // print out
         $x = 0;
         foreach ($this->list as $item) {
