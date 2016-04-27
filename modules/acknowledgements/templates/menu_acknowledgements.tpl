@@ -26,32 +26,6 @@
                 </div>
                 <div class="form-group col-sm-4">
                     <label class="col-sm-12 col-md-4">
-                        {$form.title.label}
-                    </label>
-                    <div class="col-sm-12 col-md-8">
-                        {$form.title.html}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    <label class="col-sm-12 col-md-4">
-                        {$form.start_date.label}
-                    </label>
-                    <div class="col-sm-12 col-md-8">
-                        {$form.start_date.html}
-                    </div>
-                </div>
-                <div class="form-group col-sm-4">
-                    <label class="col-sm-12 col-md-4">
-                        {$form.end_date.label}
-                    </label>
-                    <div class="col-sm-12 col-md-8">
-                        {$form.end_date.html}
-                    </div>
-                </div>
-                <div class="form-group col-sm-4">
-                    <label class="col-sm-12 col-md-4">
                         {$form.present.label}
                     </label>
                     <div class="col-sm-12 col-md-8">
@@ -136,9 +110,6 @@
                                     <div class="col-sm-12 col-md-12">{$form.addcitation_name.html}</div>
                                 </td>
                                 <td nowrap="nowrap">
-                                    <div class="col-sm-12 col-md-12">{$form.addtitle.html}</div>
-                                </td>
-                                <td nowrap="nowrap">
                                     <div class="col-sm-12 col-md-12">
                                         <select name="addaffiliations[]" multiple>
                                             <option value="douglas">Douglas</option>
@@ -190,7 +161,7 @@
                             </tr>
 
                             <tr>
-                                <td nowrap="nowrap" colspan="9" id="message-area">
+                                <td nowrap="nowrap" colspan="8" id="message-area">
                                     
                                 </td>
                                 <td nowrap="nowrap">
