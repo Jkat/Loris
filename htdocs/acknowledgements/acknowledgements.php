@@ -21,6 +21,11 @@ $client->initialize();
 $config = NDB_Config::singleton();
 $db     = Database::singleton();
 
+$factory = NDB_Factory::singleton();
+$baseurl = $factory->settings()->getBaseURL();
+
+$css = $config->getSetting('css');
+
 $publication_date = $_GET["date"];
 
 $columns = array(
@@ -46,12 +51,20 @@ $results = $db->pselect(
     array('publication_date' => $publication_date)
 );
 echo "<html>";
-echo "<table border='1'>";
-echo "<tr>";
+echo "<link rel='stylesheet' href='{$baseurl}/../../{$css}' type='text/css' />";
+echo "<link type='text/css' href='{$baseurl}/../../css/loris-jquery/jquery-ui-1.10.4.custom.min.css' rel='Stylesheet' />";
+echo "<link rel='stylesheet' href='{$baseurl}/../../bootstrap/css/bootstrap.min.css'>";
+echo "<link rel='stylesheet' href='{$baseurl}/../../bootstrap/css/custom-css.css'>";
+
+echo '<div id="tabs" style="background: white">';
+echo '<div class="tab-content">';
+echo '<div class="tab-pane active">';
+echo "<table class='table table-hover table-primary table-bordered table-unresolved-conflicts dynamictable' border='0'>";
+echo "<thead><tr class='info'>";
 foreach ($columns as $k => $v) {
-     echo "<td>" . $v . "</td>";
+     echo "<th>" . $v . "</th>";
 }
-echo "</tr>";
+echo "</tr></thead>";
 foreach ($results as $k => $v) {
     echo "<tr>";
     foreach ($v as $key => $value) {
