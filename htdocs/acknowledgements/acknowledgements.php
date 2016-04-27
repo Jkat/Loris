@@ -68,7 +68,7 @@ echo "</tr></thead>";
 foreach ($results as $k => $v) {
     echo "<tr>";
     foreach ($v as $key => $value) {
-        echo "<td>" . $value . "</td>";
+        echo "<td>" . ucwords(str_replace(",",", ",str_replace("_"," ",$value))) . "</td>";
     }
     echo "</tr>";
 }
