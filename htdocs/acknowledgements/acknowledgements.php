@@ -53,6 +53,8 @@ $results = $db->pselect(
 );
 
 
+// TODO: Transfer all this into a proper .tpl file
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
