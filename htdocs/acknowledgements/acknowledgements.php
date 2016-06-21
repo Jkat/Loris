@@ -51,6 +51,41 @@ $results = $db->pselect(
     ORDER BY ordering ASC",
     array('publication_date' => $publication_date)
 );
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+// Real CSV implementation
+$CSVheaders = array();
+$CSVdata = array();
+foreach ($columns as $k => $v) {
+    array_push($CSVheaders, $v);
+}
+foreach ($results as $k => $v) {
+    array_push($CSVdata, $v);
+}
+
+
+$toCSV['headers']    = $CSVheaders;
+$toCSV['data'] = $CSVdata;
+
+$CSV = Utility::arrayToCSV($toCSV);
+
+header("Content-Type: text/plain");
+header('Content-Disposition: attachment; filename=data.csv');
+header("Content-Length: " . strlen($CSV));
+echo $CSV;
+exit();
+//readfile($CSV);
+
+//print(Utility::arrayToCSV($toCSV));
+
+} else {
+
+
+
+
 echo "<html>";
 echo "<link rel='stylesheet' href='{$baseurl}/../../{$css}' type='text/css' />";
 echo "<link type='text/css' href='{$baseurl}/../../css/loris-jquery/jquery-ui-1.10.4.custom.min.css' rel='Stylesheet' />";
@@ -76,17 +111,21 @@ foreach ($results as $k => $v) {
 echo "</table>";
 
 echo "<br>";
-echo "CSV:";
-echo "<br>";
-echo $valuesAsStringWithQuotes;
-echo "<br>";
-foreach ($results as $k => $v) {
-    $result = implode('","', array_values($v));
-    echo '"' . $result . '"';
-    echo "<br>";
-}
+
+
+
+echo "<form action='' method='post'>";
+echo "</div>";
+echo "<input class='btn btn-primary' type='submit' value='Download as CSV'>";
+echo "</div>";
+echo "</form>";
+
+//echo "<button type='button'>Download as CSV</button>";
 
 
 echo "</html>";
+
+
+}
 
 ?>
