@@ -20,6 +20,7 @@ $server   = "mysql-loris.0ec9.hackathon.openshiftapps.com";
 $username = getenv('MYSQL_USER');
 $password = getenv('MYSQL_PASSWORD');
 $db       = getenv('MYSQL_DATABASE');
+echo $username.$password.$db; die();
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 
 $path_to_file = '../SQL/0000-00-00-schema.sql';
