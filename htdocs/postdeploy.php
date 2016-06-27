@@ -17,10 +17,11 @@ if (file_exists('../project')) {
 
 //$url      = getenv('OPENSHIFT_ENV_VAR');
 $server   = "mysql-loris.0ec9.hackathon.openshiftapps.com";
-$username = getenv('MYSQL_USER');
-$password = getenv('MYSQL_PASSWORD');
-$db       = getenv('MYSQL_DATABASE');
-echo $username.$password.$db; die();
+$server = getenv('OPENSHIFT_MYSQL_DB_HOST');
+$username = getenv('OPENSHIFT_MYSQL_DB_USERNAME');
+$password = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
+$db       = "sampledb";
+echo $server.$username.$password.$db; die();
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 
 $path_to_file = '../SQL/0000-00-00-schema.sql';
