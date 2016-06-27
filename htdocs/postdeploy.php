@@ -15,11 +15,11 @@ if (file_exists('../project')) {
     die("Directory 'project' already exists in LORIS root. Aborting deploy.");
 }
 
-$url      = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$server   = $url["host"];
-$username = $url["user"];
-$password = $url["pass"];
-$db       = substr($url["path"], 1);
+//$url      = getenv('OPENSHIFT_ENV_VAR');
+$server   = "mysql-loris.0ec9.hackathon.openshiftapps.com";
+$username = getenv('MYSQL_USER');
+$password = getenv('MYSQL_PASSWORD');
+$db       = getenv('MYSQL_DATABASE');
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 
 $path_to_file = '../SQL/0000-00-00-schema.sql';
