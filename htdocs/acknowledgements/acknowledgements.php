@@ -80,62 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo $CSV;
     exit();
 
-} else {
-
-
-
-
-/*
-echo "<html>";
-echo "<link rel='stylesheet' href='{$baseurl}/../../{$css}' type='text/css' />";
-echo "<link type='text/css' href='{$baseurl}/../../css/loris-jquery/jquery-ui-1.10.4.custom.min.css' rel='Stylesheet' />";
-echo "<link rel='stylesheet' href='{$baseurl}/../../bootstrap/css/bootstrap.min.css'>";
-echo "<link rel='stylesheet' href='{$baseurl}/../../bootstrap/css/custom-css.css'>";
-
-echo '<div id="tabs" style="background: white">';
-echo '<div class="tab-content">';
-echo '<div class="tab-pane active">';
-echo "<table class='table table-hover table-primary table-bordered table-unresolved-conflicts dynamictable' border='0'>";
-echo "<thead><tr class='info'>";
-foreach ($columns as $k => $v) {
-     echo "<th>" . $v . "</th>";
 }
-echo "</tr></thead>";
-foreach ($results as $k => $v) {
-    echo "<tr>";
-    foreach ($v as $key => $value) {
-        echo "<td>" . ucwords(str_replace(",",", ",str_replace("_"," ",$value))) . "</td>";
-    }
-    echo "</tr>";
-}
-echo "</table>";
-
-echo "<br>";
-
-
-
-echo "<form action='' method='post'>";
-echo "</div>";
-echo "<input class='btn btn-primary' type='submit' value='Download as CSV'>";
-echo "</div>";
-echo "</form>";
-
-//echo "<button type='button'>Download as CSV</button>";
-
-
-echo "</html>";
-*/
-
-}
-
-
-
-
 
 //Output template using Smarty
 $smarty = new Smarty_neurodb;
 $smarty->assign($tpl_data);
 $smarty->display('acknowledgements.tpl');
-
 
 ?>
