@@ -39,8 +39,8 @@ $columns = array(
             present       => 'Present?',
            );
 
-$keysAsString   = implode(', ', array_keys($columns));
-$valuesAsString = implode('","', array_values($columns));
+$keysAsString             = implode(', ', array_keys($columns));
+$valuesAsString           = implode('","', array_values($columns));
 $valuesAsStringWithQuotes = '"' . $valuesAsString . '"';
 
 $results = $db->pselect(
@@ -52,46 +52,33 @@ $results = $db->pselect(
     array('publication_date' => $publication_date)
 );
 
-
-// TODO: Transfer all this into a proper .tpl file
-
-$tpl_data['baseurl']     = $config->getSetting('url');
-$tpl_data['css']         = $config->getSetting('css');
+$tpl_data['baseurl'] = $config->getSetting('url');
+$tpl_data['css']     = $config->getSetting('css');
 $tpl_data['columns'] = $columns;
 $tpl_data['results'] = $results;
 
-
-
-
-
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-// Real CSV implementation
-$CSVheaders = array();
-$CSVdata = array();
-foreach ($columns as $k => $v) {
-    array_push($CSVheaders, $v);
-}
-foreach ($results as $k => $v) {
-    array_push($CSVdata, $v);
-}
+    $CSVheaders = array();
+    $CSVdata    = array();
 
+    foreach ($columns as $k => $v) {
+        array_push($CSVheaders, $v);
+    }
+    foreach ($results as $k => $v) {
+        array_push($CSVdata, $v);
+    }
 
-$toCSV['headers']    = $CSVheaders;
-$toCSV['data'] = $CSVdata;
+    $toCSV['headers'] = $CSVheaders;
+    $toCSV['data']    = $CSVdata;
 
-$CSV = Utility::arrayToCSV($toCSV);
+    $CSV = Utility::arrayToCSV($toCSV);
 
-header("Content-Type: text/plain");
-header('Content-Disposition: attachment; filename=data.csv');
-header("Content-Length: " . strlen($CSV));
-echo $CSV;
-exit();
-//readfile($CSV);
-
-//print(Utility::arrayToCSV($toCSV));
+    header("Content-Type: text/plain");
+    header('Content-Disposition: attachment; filename=data.csv');
+    header("Content-Length: " . strlen($CSV));
+    echo $CSV;
+    exit();
 
 } else {
 
