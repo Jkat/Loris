@@ -55,6 +55,16 @@ $results = $db->pselect(
 
 // TODO: Transfer all this into a proper .tpl file
 
+$tpl_data['baseurl']     = $config->getSetting('url');
+$tpl_data['css']         = $config->getSetting('css');
+$tpl_data['columns'] = $columns;
+$tpl_data['results'] = $results;
+
+
+
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -88,6 +98,7 @@ exit();
 
 
 
+/*
 echo "<html>";
 echo "<link rel='stylesheet' href='{$baseurl}/../../{$css}' type='text/css' />";
 echo "<link type='text/css' href='{$baseurl}/../../css/loris-jquery/jquery-ui-1.10.4.custom.min.css' rel='Stylesheet' />";
@@ -126,8 +137,18 @@ echo "</form>";
 
 
 echo "</html>";
-
+*/
 
 }
+
+
+
+
+
+//Output template using Smarty
+$smarty = new Smarty_neurodb;
+$smarty->assign($tpl_data);
+$smarty->display('acknowledgements.tpl');
+
 
 ?>
