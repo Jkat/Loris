@@ -34,14 +34,10 @@ $columns = array(
             affiliations  => 'Affiliations',
             degrees       => 'Degrees',
             roles         => 'Roles',
-            start_date    => 'Start Date',
-            end_date      => 'End Date',
             present       => 'Present?',
            );
 
 $keysAsString             = implode(', ', array_keys($columns));
-$valuesAsString           = implode('","', array_values($columns));
-$valuesAsStringWithQuotes = '"' . $valuesAsString . '"';
 
 $results = $db->pselect(
     "SELECT " . $keysAsString .
