@@ -22,6 +22,9 @@ $username = getenv('MYSQL_USER');
 $password = getenv('MYSQL_PASSWORD');
 $db       = getenv('MYSQL_DATABASE');
 //echo $server.$username.$password.$db; die();
+error_reporting(E_ALL | E_STRICT);
+ini_set('display_errors',1);
+ini_set('html_errors', 1);
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 echo 'hi'; die();
 
