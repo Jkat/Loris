@@ -25,6 +25,10 @@ $db       = getenv('MYSQL_DATABASE');
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors',1);
 ini_set('html_errors', 1);
+error_log($server);
+error_log($password);
+error_log($username);
+error_log($db);
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 echo 'hi'; die();
 
