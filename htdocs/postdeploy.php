@@ -23,6 +23,7 @@ $password = getenv('MYSQL_PASSWORD');
 $db       = getenv('MYSQL_DATABASE');
 //echo $server.$username.$password.$db; die();
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
+echo 'hi'; die();
 
 $path_to_file = '../SQL/0000-00-00-schema.sql';
 $sqls         = file_get_contents($path_to_file);
