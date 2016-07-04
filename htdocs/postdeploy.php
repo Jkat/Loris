@@ -15,20 +15,11 @@ if (file_exists('../project')) {
     die("Directory 'project' already exists in LORIS root. Aborting deploy.");
 }
 
-//$url      = getenv('OPENSHIFT_ENV_VAR');
-//$server   = "mysql-loris.0ec9.hackathon.openshiftapps.com";
 $server = getenv('MYSQL_HOST');
 $username = getenv('MYSQL_USER');
 $password = getenv('MYSQL_PASSWORD');
 $db       = getenv('MYSQL_DATABASE');
-//echo $server.$username.$password.$db; die();
-error_reporting(E_ALL | E_STRICT);
-ini_set('display_errors',1);
-ini_set('html_errors', 1);
-error_log($server);
-error_log($password);
-error_log($username);
-error_log($db);
+
 $conn     = new PDO("mysql:host=".$server."; dbname=".$db, $username, $password);
 
 $path_to_file = '../SQL/0000-00-00-schema.sql';
@@ -65,7 +56,7 @@ $conn->query(
     WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='base')"
 );
 $conn->query(
-    "UPDATE Config SET Value='' 
+    "UPDATE Config SET Value='" . $_SERVER[HTTP_HOST] . "' 
     WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='url')"
 );
 $conn->query(
@@ -89,6 +80,6 @@ $file_contents = str_replace("%PASSWORD%", "$password", $file_contents);
 $file_contents = str_replace("%DATABASE%", "$db", $file_contents);
 file_put_contents('../project/config.xml', $file_contents);
 
-header("Location: /");
+header("Location: /htdocs/main.php");
 
 ?>
