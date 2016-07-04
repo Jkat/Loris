@@ -84,16 +84,15 @@ class CouchDBMRIImporter
         foreach ($ScanTypes as $Scan) {
             $Query .= ", (SELECT f.File FROM files f LEFT JOIN files_qcstatus fqc
                       USING(FileID)
-                      LEFT JOIN parameter_file p
-                      ON (p.FileID=f.FileID
-                      AND p.ParameterTypeID=$Scan[ParameterTypeID])
-                      WHERE f.SessionID=s.ID AND p.Value='$Scan[ScanType]' LIMIT 1)
+                      WHERE f.SessionID=s.ID AND fqc.Selected='$Scan[ScanType]' LIMIT 1)
                             as `Selected_$Scan[ScanType]`, (SELECT fqc.QCStatus
                       FROM files f LEFT JOIN files_qcstatus fqc USING(FileID)
                       LEFT JOIN parameter_file p ON (p.FileID=f.FileID
                       AND p.ParameterTypeID=$Scan[ParameterTypeID])
-                      WHERE f.SessionID=s.ID AND p.Value='$Scan[ScanType]' LIMIT 1)
-                             as `$Scan[ScanType]_QCStatus`, (SELECT ROUND(TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(p.Value, '%Y%m%d'),'%Y-%m-%d')) + DATEDIFF(date_format(str_to_date(p.Value, '%Y%m%d'),'%Y-%m-%d'), c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(p.Value, '%Y%m%d'),'%Y-%m-%d')) MONTH) / DATEDIFF(c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(p.Value, '%Y%m%d'),'%Y-%m-%d')) + 1 MONTH, c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(p.Value, '%Y%m%d'),'%Y-%m-%d')) MONTH),1) FROM files f LEFT JOIN files_qcstatus fqc USING(FileID) LEFT JOIN parameter_file p ON (p.FileID=f.FileID AND f.File like '%$Scan[ScanType]%') WHERE f.SessionID=s.ID AND fqc.QCStatus='Pass' AND p.ParameterTypeID=59406 LIMIT 1) as `Age_$Scan[ScanType]`";
+                      WHERE f.SessionID=s.ID AND fqc.Selected='$Scan[ScanType]' LIMIT 1)
+                             as `$Scan[ScanType]_QCStatus`, (SELECT ROUND(TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(fqc.Selected, '%Y%m%d'),'%Y-%m-%d')) + DATEDIFF(date_format(str_to_date(fqc.Selected, '%Y%m%d'),'%Y-%m-%d'), c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(fqc.Selected, '%Y%m%d'),'%Y-%m-%d')) MONTH) / DATEDIFF(c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(fqc.Selected, '%Y%m%d'),'%Y-%m-%d')) + 1 MONTH, c.DoB + INTERVAL TIMESTAMPDIFF(MONTH, c.DoB, date_format(str_to_date(fqc.Selected, '%Y%m%d'),'%Y-%m-%d')) MONTH),1) FROM files f LEFT JOIN files_qcstatus fqc USING(FileID) LEFT JOIN parameter_file p ON (p.FileID=f.FileID AND f.File like '%$Scan[ScanType]%') WHERE f.SessionID=s.ID AND fqc.QCStatus='Pass' AND p.ParameterTypeID=59406 LIMIT 1) as `Age_$Scan[ScanType]`";
+                      WHERE f.SessionID=s.ID AND fqc.Selected='$Scan[ScanType]' LIMIT 1)
+                             as `$Scan[ScanType]_QCStatus`";
         }
         $Query .= " FROM session s JOIN candidate c USING (CandID)
                     LEFT JOIN feedback_mri_comments fmric
@@ -369,13 +368,9 @@ class CouchDBMRIImporter
     public function getScanTypes()
     {
         $ScanTypes = $this->SQLDB->pselect(
-            "SELECT DISTINCT pf.ParameterTypeID,
-                          pf.Value as ScanType
-                     FROM parameter_type pt
-                     JOIN parameter_file pf
-                     USING (ParameterTypeID)
-                     WHERE pt.Name='selected'
-                     AND COALESCE(pf.Value, '') <> ''",
+            "SELECT DISTINCT fqc.Selected as ScanType
+                     FROM files_qcstatus fqc
+                     WHERE COALESCE(fqc.Selected, '') <> ''",
             array()
         );
         return $ScanTypes;

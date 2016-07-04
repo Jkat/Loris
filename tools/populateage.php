@@ -17,10 +17,6 @@ $client->initialize();
 $config = NDB_Config::singleton();
 
 $db =& Database::singleton();
-if(PEAR::isError($db)) {
-    fwrite(STDERR, "Could not connect to database: ".$db->getMessage());
-    return false;
-}
 
 $database = $config->getSetting('database');
 

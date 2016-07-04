@@ -24,9 +24,11 @@ require_once '../modules/participant_status/php/NDB_Form_participant_status.clas
  */
 class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
 {
+    var $AjaxModule = true;
     /**
      * Overloading this method to allow access to site users (their own site only)
      * and users w/ multisite privs
+     *
      * @return true if user has access, false otherwise
      */
     function _hasAccess()
@@ -34,8 +36,8 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
         // create user object
         $user =& User::singleton();
         $site =& Site::singleton($user->getData('CenterID'));
-        $this->tpl_data['access_all_profiles']
-            = $user->hasPermission('access_all_profiles');
+        $aap  = $user->hasPermission('access_all_profiles');
+        $this->tpl_data['access_all_profiles'] = $aap;
         return (
             $user->hasPermission('access_all_profiles')
             || ($site->isStudySite() && $user->hasPermission('data_entry'))
@@ -67,15 +69,16 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
                           'c.CandID AS DCCID',
                           'c.PSCID',
                           'c.Gender',
-                          'COALESCE(pso.ID,1) AS Participant_Status',
+                          "COALESCE(pso.Description,'Active') "
+                          . " AS Participant_Status",
                          );
         if ($useProjects) {
-            $this->columns[] = 'min(c.ProjectID) as Project';
+            $this->columns[] = 'p.Name as Project';
         }
         $this->columns =array_merge(
             $this->columns,
             array(
-             'min(s.SubprojectID) as Subproject',
+             'GROUP_CONCAT(DISTINCT sp.title) as Subproject',
              'DATE_FORMAT(c.DoB,\'%Y-%m-%d\') AS DoB',
              'MAX(s.Scan_done) as scan_Done',
             )
@@ -104,7 +107,7 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
 
         // Need distinct because of joining with feedback_bvl_thread
         $VisitCountSQL = 'COUNT(DISTINCT s.Visit_label)';
-        $FeedbackSQL   = 'MIN(feedback_bvl_thread.Status+0)';
+        $FeedbackSQL   = 'IFNULL(MIN(feedback_bvl_thread.Status+0),0)';
 
         $this->columns = array_merge(
             $this->columns,
@@ -133,7 +136,7 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
 
                           //'COALESCE(pso.ID,1) AS Participant_Status',
         $this->group_by = 'c.CandID, psc.Name, c.PSCID, c.Gender';
-        $this->order_by = 'psc.Name, c.CandID DESC';
+        $this->order_by = 'c.PSCID ASC';
 
         if ($useProjects) {
             $this->validFilters[] = 'c.ProjectID';
@@ -216,8 +219,7 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
             $site =& Site::singleton($user->getData('CenterID'));
             if ($site->isStudySite()) {
                 $list_of_sites = array();
-                $list_of_sites[$user->getData('CenterID')]
-                    = $user->getData('Site');
+                $list_of_sites[$user->getData('CenterID')] = $user->getData('Site');
             }
         }
 
@@ -397,6 +399,26 @@ class NDB_Menu_Filter_Candidate_List extends NDB_Menu_Filter
         }
         $this->tpl_data['numCandidates'] = $this->TotalItems;
         return true;
+    }
+
+    /**
+     * Include the column formatter required to display the feedback link colours
+     * in the candidate_list menu
+     *
+     * @return array of javascript to be inserted
+     */
+    function getJSDependencies()
+    {
+        $factory = NDB_Factory::singleton();
+        $baseURL = $factory->settings()->getBaseURL();
+        $deps    = parent::getJSDependencies();
+        return array_merge(
+            $deps,
+            array(
+             $baseURL . "/js/advancedMenu.js",
+             $baseURL . "/candidate_list/js/columnFormatter.js",
+            )
+        );
     }
 }
 ?>

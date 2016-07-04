@@ -1,7 +1,4 @@
 <?php
-require_once 'Utility.class.inc';
-require_once 'NDB_Form.class.inc';
-
 /**
  * The welcome menu
  * @package main
@@ -10,9 +7,6 @@ class NDB_Form_statistics extends NDB_Form
 {
     function _hasAccess() {
         $user =& User::singleton();
-        if(Utility::isErrorX($user)) {
-            return PEAR::raiseError("User Error: ".$user->getMessage());
-        }
         return $user->hasPermission('data_entry');
     }
 
@@ -70,9 +64,6 @@ class NDB_Form_statistics extends NDB_Form
     function statistics()
     {
         $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
 
         $this->tpl_data['StatsTabs'] = $DB->pselect(
             "SELECT ModuleName, SubModuleName, Description
@@ -84,22 +75,14 @@ class NDB_Form_statistics extends NDB_Form
 
     function stats_general()
     {
-        $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
+        //$DB =& Database::singleton();
     }
 
     function stats_behavioural()
     {
         $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
         $DB->select("SELECT CONCAT('C', CenterID) as ID, CenterID as NumericID, PSCArea as LongName, Name as ShortName FROM psc WHERE CenterID <> '1' AND Study_site = 'Y'", $centers);
-        if(Utility::isErrorX($centers)) {
-            return PEAR::raiseError("DB Error: ".$centers->getMessage());
-        }
+
         $this->tpl_data['Centers'] = $centers;
         $this->tpl_data['Sites'] = array('' => 'All Sites');
 
@@ -176,6 +159,18 @@ class NDB_Form_statistics extends NDB_Form
             }
         }
         // DDE STATS
+        $ddeInstruments = $config->getSetting('DoubleDataEntryInstruments');
+        $ddeInstrumentsQuoted = array();
+        foreach ($ddeInstruments as $ddeInstrument) {
+            array_push($ddeInstrumentsQuoted, $DB->quote($ddeInstrument));
+        }
+
+        $ddeInstrumentCriteria = "";
+        if ($ddeInstruments != null) {
+            $ddeInstrumentCriteria = implode(" OR f.Test_name=", $ddeInstrumentsQuoted);
+            $ddeInstrumentCriteria = "AND (f.Test_name =" . $ddeInstrumentCriteria . ") ";
+        }
+        
         $DB->select("SELECT s.CenterID, 
                 f.Data_Entry as Data_Entry, 
                 s.visit_label as VLabel,
@@ -185,9 +180,8 @@ class NDB_Form_statistics extends NDB_Form
                 AND s.Current_stage <> 'Recycling Bin'
                 AND f.CommentID LIKE 'DDE%' 
                 AND c.Active='Y' 
-                AND (f.Test_name NOT LIKE '%parameter%' 
-                    AND f.Test_name NOT LIKE '%radiological%' 
-                    AND f.Test_name NOT LIKE '%vineland%')
+                $ddeInstrumentCriteria
+                $ExtraProject_Criteria
                 GROUP BY s.CenterID, VLabel, f.Data_Entry ORDER BY c.PSCID;",
             $result);
         foreach($result as $row) {
@@ -215,9 +209,6 @@ class NDB_Form_statistics extends NDB_Form
     function stats_MRI()
     {
         $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
 
         $projects[null] = 'All Projects';
         foreach(Utility::getProjectList() as $key => $value) {
@@ -249,9 +240,6 @@ class NDB_Form_statistics extends NDB_Form
         $this->tpl_data['Projects'] = $projects;
 
         $DB->select("SELECT CONCAT('C', CenterID) as ID, CenterID as NumericID, PSCArea as LongName, Name as ShortName FROM psc WHERE CenterID <> '1' AND Study_site = 'Y'", $centers);
-        if(Utility::isErrorX($centers)) {
-            return PEAR::raiseError("DB Error: ".$centers->getMessage());
-        }
         $this->tpl_data['Centers'] = $centers;
         $this->tpl_data['Sites'] = array('' => 'All Sites');
         foreach ($centers as $row) {
@@ -772,13 +760,7 @@ class NDB_Form_statistics extends NDB_Form
     function stats_reliability()
     {
         $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
         $DB->select("SELECT CONCAT('C', CenterID) as ID, CenterID as NumericID, PSCArea as LongName, Name as ShortName FROM psc WHERE CenterID <> '1' AND Study_site = 'Y'", $centers);
-        if(Utility::isErrorX($centers)) {
-            return PEAR::raiseError("DB Error: ".$centers->getMessage());
-        }
         $this->tpl_data['Centers'] = $centers;
         $this->tpl_data['Sites'] = array('' => 'All Sites');
         $projects[null] = 'All Projects';
@@ -809,9 +791,6 @@ class NDB_Form_statistics extends NDB_Form
     function stats_demographic()
     {
         $DB =& Database::singleton();
-        if (Utility::isErrorX($DB)) {
-            return PEAR::raiseError("Could not connect to database: ".$DB->getMessage());
-        }
 
         $projects[null] = 'All Projects';
         foreach(Utility::getProjectList() as $key => $value) {
@@ -853,9 +832,6 @@ class NDB_Form_statistics extends NDB_Form
 
             // Total, explicitly calculated instead of added in the loop to ensure there's no one double registered in 2 different cohorts
             $DB->select("SELECT count(distinct(c.PSCID)) from candidate as c WHERE c.PSCID<>'scanner' AND c.CenterID<>'1' AND c.Active='Y' $ExtraSite_Criteria $ExtraProject_Criteria", $total);
-            if (Utility::isErrorX($total)) {
-                return PEAR::raiseError("DB Error: ".$total->getMessage());
-            }
             list(,$total)=each($total[0]);
             $Total_candidates = $total;
             $this->tpl_data['Total_candidates'] = $Total_candidates;
@@ -906,9 +882,6 @@ class NDB_Form_statistics extends NDB_Form
         // Adds a C to the start of the centerid, because that's how the
         // template is looking for it. Exclude DCC 
         $DB->select("SELECT CONCAT('C', CenterID) as ID, CenterID as NumericID, PSCArea as LongName, Name as ShortName FROM psc WHERE CenterID <> '1' AND Study_site = 'Y'", $centers);
-        if(Utility::isErrorX($centers)) {
-            return PEAR::raiseError("DB Error: ".$centers->getMessage());
-        }
         $this->tpl_data['Centers'] = $centers;
         $this->tpl_data['Sites'] = array('' => 'All Sites');
         foreach ($centers as $row) {
@@ -971,9 +944,6 @@ class NDB_Form_statistics extends NDB_Form
                 AND COALESCE(s.Screening,'') NOT IN ('Failure', 'Withdrawal')
                 AND COALESCE(s.Visit,'') NOT IN ('Failure', 'Withdrawal')
                 GROUP BY c.CenterID, SubprojectID, VLabel, Subcat", $result);
-            if (Utility::isErrorX($result)) {
-                return PEAR::raiseError("DB Error: ".$result->getMessage());
-            }
             $this->tpl_data['RecruitsTable'] = $this->render_stats_table("Breakdown of Registered Candidates", $Subcategories, $Visits, "DemographicInstrument", $instruments, '', $centers, $result, "demographics", $currentProject);
 
         }
