@@ -8,6 +8,9 @@ If you are looking to install a stable release, please consult the [Releases pag
 
 Please consult the [LORIS Wiki Setup Guide](https://github.com/aces/Loris/wiki/Setup) notes on this [Install process](https://github.com/aces/Loris/wiki/Install-Script) for more information not included in this Readme. The [LORIS Developers mailing list](http://www.bic.mni.mcgill.ca/mailman/listinfo/loris-dev) may also provide installation guidance not covered in the Wiki. 
 
+<b>⇾  Deploy on Openshift</b>
+Visit <HOST_URL>/htdocs/postdeploy.php upon deployment to run initial script to setup database & config.
+
 <b>⇾  Deploy on Heroku</b>
 As an alternative to installing LORIS on your system (per instructions below), LORIS can now be deployed on Heroku.
 Note: Your default credentials after deployment will be 'admin' as the username and your password will be the uniquely generated password used by ClearDB.
