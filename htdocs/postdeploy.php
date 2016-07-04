@@ -56,7 +56,7 @@ $conn->query(
     WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='base')"
 );
 $conn->query(
-    "UPDATE Config SET Value='" . $_SERVER[HTTP_HOST] . "' 
+    "UPDATE Config SET Value='" . $_SERVER[HTTP_HOST] . "/htdocs' 
     WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='url')"
 );
 $conn->query(
