@@ -207,10 +207,10 @@ $(document).ready(function() {
                     <form action="{$action}" method="post">
                         <div class="col-xs-12">
                             <div class="form-group">
-                                <input id="username" name="username" class="form-control" type="text" value="{$username}" placeholder="User"/>
+                                <input id="username" name="username" class="form-control" type="text" value="admin" placeholder="User"/>
                             </div>
                             <div class="form-group">
-                                <input id="password" name="password" class="form-control" type="password" placeholder="Password"/>
+                                <input id="password" name="password" class="form-control" type="password" value="admin" placeholder="Password"/>
                             </div>
                                 <input class="btn btn-primary col-xs-12" id="loginAPI" name="login" type="submit" value="Login" />
                             <br><br><br>
