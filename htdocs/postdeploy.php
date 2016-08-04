@@ -12,7 +12,7 @@
  */
 
 if (file_exists('../project')) {
-    die("Directory 'project' already exists in LORIS root. Aborting deploy.");
+    header("Location: /htdocs/main.php");
 }
 
 $server = getenv('MYSQL_HOST');
