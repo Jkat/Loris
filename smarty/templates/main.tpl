@@ -143,11 +143,6 @@
                         </li>
                         {/if}
 
-                        <li class="hidden-xs hidden-sm">
-                            <a href="#" class="navbar-brand pull-right help-button">
-                                <img width=17 src="{$baseurl}/images/help.gif">
-                            </a>
-                        </li>
                         <li>
                             <p class="navbar-text">
                                 &nbsp;&nbsp;  Site: {$user.Site} &nbsp;
