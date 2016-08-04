@@ -13,6 +13,7 @@
 
 if (file_exists('../project')) {
     header("Location: /htdocs/main.php");
+    exit();
 }
 
 $server = getenv('MYSQL_HOST');
