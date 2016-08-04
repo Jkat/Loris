@@ -36,7 +36,6 @@ INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
 
 INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES 
     ('Statistics', 'statistics/', (SELECT ID FROM LorisMenu as L WHERE Label='Reports'), 1),
-    ('Data Query Tool', 'dataquery/', (SELECT ID FROM LorisMenu as L WHERE Label='Reports'), 2);
 
 INSERT INTO LorisMenu (Label, Link, Parent, OrderNumber) VALUES
     ('Data Dictionary', 'datadict/', (SELECT ID FROM LorisMenu as L WHERE Label='Tools'), 1),
