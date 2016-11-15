@@ -157,6 +157,37 @@ if (PEAR::isError($participantstatus)) {
 writeExcel($Test_name, $participantstatus, $dataDir);
 
 /*
+* Family History AD Other
+*/
+$Test_name = "FamilyHistoryADOther";
+$query = "select PSCID, family_history_ad_other.CandID, family_member, parental_side, ad_dementia_age, living_age, death_age, death_cause, death_cause_status from family_history_ad_other join candidate on family_history_ad_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$DB->select($query, $familyhistoryadother);
+if (PEAR::isError($familyhistoryadother)) {
+        PEAR::raiseError("Could not generate family history ad other. " . $familyhistoryadother->getMessage());
+}
+writeExcel($Test_name, $familyhistoryadother, $dataDir);
+/*
+* Family History First Degree
+*/
+$Test_name = "FamilyHistoryFirstDegree";
+$query = "select PSCID, family_history_first_degree.CandID, family_member, living_age, death_age, death_cause, death_cause_status, ad_dementia, ad_dementia_age, diagnosis_history, diagnosis_history_status from family_history_first_degree join candidate on family_history_first_degree.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$DB->select($query, $familyhistoryfirstdegree);
+if (PEAR::isError($familyhistoryfirstdegree)) {
+        PEAR::raiseError("Could not generate family history first degree. " . $familyhistoryfirstdegree->getMessage());
+}
+writeExcel($Test_name, $familyhistoryfirstdegree, $dataDir);
+/*
+* Family History Memory Problem Other
+*/
+$Test_name = "FamilyHistoryMemoryProblemOther";
+$query = "select PSCID, family_history_memory_problem_other.CandID, family_member, parental_side, other_memory_problems, other_memory_problems_status, living_age, death_age, death_cause, death_cause_status from family_history_memory_problem_other join candidate on family_history_memory_problem_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$DB->select($query, $familyhistorymemoryproblemother);
+if (PEAR::isError($familyhistorymemoryproblemother)) {
+        PEAR::raiseError("Could not generate family history memory problem other. " . $familyhistorymemoryproblemother->getMessage());
+}
+writeExcel($Test_name, $familyhistorymemoryproblemother, $dataDir);
+
+/*
 * Family Information
 */
 $Test_name = "FamilyInformation";
