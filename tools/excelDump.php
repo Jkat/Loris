@@ -339,18 +339,6 @@ function writeExcel ($Test_name, $instrument_table, $dataDir) {
 		$instrument_table[$i] = array_diff_key($instrument_table[$i], array_flip($junkCols));
 	}
 
-	//Use Excel 97/2000 Binary File Format thereby allowing cells to contain more than 255 characters.
-	$workbook->setVersion(8); // Use Excel97/2000 Format.
-
-	// Formatting for the header row; bold and frozen
-	$headerFormat =& $workbook->addFormat();
-	$headerFormat->setBold();
-	$headerFormat->setAlign('center');
-
-	// Formatting:  Freeze only the first worksheet, at the metaCols and header intersection.
-	//	$worksheet =& $worksheets[0];
-	//	$worksheet->freezePanes(array(1, count($metaCols), 1, count($metaCols)));  //change after # of cols are decided.
-
 	// add all header rows
 	$headers = array_keys($instrument_table[0]);
     $ExcelWorkSheet->fromArray($headers, ' ', 'A1');
