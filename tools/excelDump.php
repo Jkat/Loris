@@ -263,7 +263,7 @@ foreach ($scan_types as $scan_type) {
     MapSubprojectID($scan_type_table);
     writeExcel("mri_feedbacks_$Test_name", $scan_type_table, $dataDir);
 }
-
+/*
 //MRI data construction
 //Using CouchDBMRIImporter since same data is imported to DQT.
 $Test_name = "MRI_Data";
@@ -283,7 +283,7 @@ foreach($mriDataDictionary as $dicKey=>$dicVal)
 }
 
 writeExcel($Test_name, $candidateData, $dataDir);
-
+*/
 // disabling .tgz compression format
 /*// Clean up
 // tar and gzip the product
