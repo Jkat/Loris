@@ -366,9 +366,12 @@ class CouchDBMRIImporter
     public function getScanTypes()
     {
         $ScanTypes = $this->SQLDB->pselect(
+/*
             "SELECT DISTINCT fqc.Selected as ScanType
                      FROM files_qcstatus fqc
                      WHERE COALESCE(fqc.Selected, '') <> ''",
+*/
+"select 1 as ParameterTypeID,Scan_type as ScanType from mri_scan_type",
             array()
         );
         return $ScanTypes;
