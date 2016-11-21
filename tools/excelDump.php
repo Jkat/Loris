@@ -25,6 +25,15 @@ if (isset($argv[1])) {
     $limit_date = "";
     $limit_date_candidates = "";
 }
+if (isset($argv[2]) && $argv[2] == 'nofail') {
+    $nofail = " AND s.Visit!='Failure' ";
+    $wherenofail = " WHERE c.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit!='Failure' AND session.Visit_label LIKE "%EL00%") ";
+    $wherenofailnowhere = " AND candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
+} else {
+    $nofail = "";
+    $wherenofail = "";
+    $wherenofailnowhere = "";
+}
 
 //Configuration variables for this script, possibly installation dependent.
 //$dataDir = "dataDump" . date("dMy");
@@ -92,21 +101,21 @@ foreach ($instruments as $instrument) {
         //Query to pull the data from the DB
         $Test_name = $instrument['Test_name'];
         if ($Test_name == 'prefrontal_task') {
-	    $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, 'See validity_of_data field' as Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . " order by s.Visit_label, c.PSCID";
+	    $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, 'See validity_of_data field' as Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . $nofail . " order by s.Visit_label, c.PSCID";
         } else if ($Test_name == 'radiology_review') {
-            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, 'Site review:', i.*, 'Final Review:', COALESCE(fr.Review_Done, 0) as Review_Done, fr.Final_Review_Results, fr.Final_Exclusionary, fr.Final_Incidental_Findings, fre.full_name as Final_Examiner_Name, fr.Final_Review_Results2, fre2.full_name as Final_Examiner2_Name, fr.Final_Exclusionary2, COALESCE(fr.Review_Done2, 0) as Review_Done2, fr.Final_Incidental_Findings2, fr.Finalized from candidate c, session s, flag f, $Test_name i left join final_radiological_review fr ON (fr.CommentID=i.CommentID) left outer join examiners e on (i.Examiner = e.examinerID) left join examiners fre ON (fr.Final_Examiner=fre.examinerID) left join examiners fre2 ON (fre2.examinerID=fr.Final_Examiner2) where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' AND Scan_done='Y' " . $limit_date_instruments . " order by s.Visit_label, c.PSCID";
+            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, 'Site review:', i.*, 'Final Review:', COALESCE(fr.Review_Done, 0) as Review_Done, fr.Final_Review_Results, fr.Final_Exclusionary, fr.Final_Incidental_Findings, fre.full_name as Final_Examiner_Name, fr.Final_Review_Results2, fre2.full_name as Final_Examiner2_Name, fr.Final_Exclusionary2, COALESCE(fr.Review_Done2, 0) as Review_Done2, fr.Final_Incidental_Findings2, fr.Finalized from candidate c, session s, flag f, $Test_name i left join final_radiological_review fr ON (fr.CommentID=i.CommentID) left outer join examiners e on (i.Examiner = e.examinerID) left join examiners fre ON (fr.Final_Examiner=fre.examinerID) left join examiners fre2 ON (fre2.examinerID=fr.Final_Examiner2) where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' AND Scan_done='Y' " . $limit_date_instruments . $nofail . " order by s.Visit_label, c.PSCID";
         } else if ($Test_name == 'genetics') {
-            $query = "select CandID, g.* from genetics g JOIN candidate USING (PSCID)";
+            $query = "select c.CandID, g.* from genetics g JOIN candidate c USING (PSCID)";
         } else {
             if (is_file("../project/instruments/NDB_BVL_Instrument_$Test_name.class.inc")) {
                 $instrument =& NDB_BVL_Instrument::factory($Test_name, '', false);
                 if ($instrument->ValidityEnabled == true) {
-	            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . " order by s.Visit_label, c.PSCID";
+	            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . $nofail . " order by s.Visit_label, c.PSCID";
                 } else {
-	            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . " order by s.Visit_label, c.PSCID";
+	            $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . $nofail . " order by s.Visit_label, c.PSCID";
                 }
             } else {
-	        $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . " order by s.Visit_label, c.PSCID";
+	        $query = "select c.PSCID, c.CandID, s.SubprojectID, s.Visit_label, s.Submitted, s.Current_stage, s.Visit, f.Administration, e.full_name as Examiner_name, f.Data_entry, f.Validity, i.* from candidate c, session s, flag f, $Test_name i left outer join examiners e on i.Examiner = e.examinerID where c.PSCID not like 'dcc%' and c.PSCID not like '0%' and c.PSCID not like '1%' and c.PSCID not like '2%' and c.PSCID != 'scanner' and i.CommentID not like 'DDE%' and c.CandID = s.CandID and s.ID = f.sessionID and f.CommentID = i.CommentID AND c.Active='Y' AND s.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_instruments . $nofail . " order by s.Visit_label, c.PSCID";
             }
         }
 	$DB->select($query, $instrument_table);
@@ -120,7 +129,7 @@ foreach ($instruments as $instrument) {
 */
 $Test_name = "candidate_info";
 //this query is a but clunky, but it gets rid of all the crap that would otherwise appear.
-$query = "select distinct c.PSCID, c.CandID, c.Gender, c.Mother_tongue, s.SubprojectID from candidate c, session s where s.CenterID <> 1 and s.CenterID in (select CenterID from psc where Study_site='Y') and c.CandID = s.CandID and c.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_candidates . " order by c.PSCID";
+$query = "select distinct c.PSCID, c.CandID, c.Gender, c.Mother_tongue, s.SubprojectID from candidate c, session s where s.CenterID <> 1 and s.CenterID in (select CenterID from psc where Study_site='Y') and c.CandID = s.CandID and c.Active='Y' AND c.PSCID not like 'MTL0000' AND c.PSCID not like 'MTL999%' " . $limit_date_candidates . $nofail . " order by c.PSCID";
 $DB->select($query, $results);
 MapSubprojectID(&$results);
 writeExcel($Test_name, $results, $dataDir);
@@ -138,7 +147,7 @@ writeExcel($Test_name, $dictionary, $dataDir);
 * Participant Status
 */
 $Test_name = "ParticipantStatus";
-$query = "select candidate.PSCID, candidate.CandID, data_changed_date, data_entry_date, pso.Description as 'Participant Status Description', reason_specify, reason_specify_status, withdrawal_reasons, withdrawal_reasons_other_specify, withdrawal_reasons_other_specify_status, naproxen_eligibility, naproxen_eligibility_reason_specify, naproxen_eligibility_reason_specify_status, naproxen_eligibility_status, naproxen_excluded_reason_specify, naproxen_excluded_reason_specify_status, naproxen_withdrawal_reasons, naproxen_withdrawal_reasons_other_specify, naproxen_withdrawal_reasons_other_specify_status from participant_status as psh join candidate on (candidate.CandID=psh.CandID) join participant_status_options as pso on (psh.participant_status=pso.ID) where candidate.PSCID not like 'MTL0000' AND candidate.PSCID not like 'MTL999%' order by candidate.PSCID asc";
+$query = "select candidate.PSCID, candidate.CandID, data_changed_date, data_entry_date, pso.Description as 'Participant Status Description', reason_specify, reason_specify_status, withdrawal_reasons, withdrawal_reasons_other_specify, withdrawal_reasons_other_specify_status, naproxen_eligibility, naproxen_eligibility_reason_specify, naproxen_eligibility_reason_specify_status, naproxen_eligibility_status, naproxen_excluded_reason_specify, naproxen_excluded_reason_specify_status, naproxen_withdrawal_reasons, naproxen_withdrawal_reasons_other_specify, naproxen_withdrawal_reasons_other_specify_status from participant_status as psh join candidate on (candidate.CandID=psh.CandID) join participant_status_options as pso on (psh.participant_status=pso.ID) where candidate.PSCID not like 'MTL0000' AND candidate.PSCID not like 'MTL999%' " . $wherenofailnowhere . " order by candidate.PSCID asc";
 $DB->select($query, $participantstatus);
 if (PEAR::isError($participantstatus)) {
         PEAR::raiseError("Could not generate participant status. " . $participantstatus->getMessage());
@@ -149,7 +158,7 @@ writeExcel($Test_name, $participantstatus, $dataDir);
 * Participant Status History
 */
 $Test_name = "ParticipantStatusHistory";
-$query = "select candidate.PSCID, candidate.CandID, data_changed_date, data_entry_date, pso.Description as 'Participant Status Description', reason_specify, reason_specify_status, withdrawal_reasons, withdrawal_reasons_other_specify, withdrawal_reasons_other_specify_status, naproxen_eligibility, naproxen_eligibility_reason_specify, naproxen_eligibility_reason_specify_status, naproxen_eligibility_status, naproxen_excluded_reason_specify, naproxen_excluded_reason_specify_status, naproxen_withdrawal_reasons, naproxen_withdrawal_reasons_other_specify, naproxen_withdrawal_reasons_other_specify_status from participant_status_history as psh join candidate on (candidate.CandID=psh.CandID) join participant_status_options as pso on (psh.participant_status=pso.ID) where candidate.PSCID not like 'MTL0000' AND candidate.PSCID not like 'MTL999%' order by candidate.PSCID asc";
+$query = "select candidate.PSCID, candidate.CandID, data_changed_date, data_entry_date, pso.Description as 'Participant Status Description', reason_specify, reason_specify_status, withdrawal_reasons, withdrawal_reasons_other_specify, withdrawal_reasons_other_specify_status, naproxen_eligibility, naproxen_eligibility_reason_specify, naproxen_eligibility_reason_specify_status, naproxen_eligibility_status, naproxen_excluded_reason_specify, naproxen_excluded_reason_specify_status, naproxen_withdrawal_reasons, naproxen_withdrawal_reasons_other_specify, naproxen_withdrawal_reasons_other_specify_status from participant_status_history as psh join candidate on (candidate.CandID=psh.CandID) join participant_status_options as pso on (psh.participant_status=pso.ID) where candidate.PSCID not like 'MTL0000' AND candidate.PSCID not like 'MTL999%' " . $wherenofailnowhere . " order by candidate.PSCID asc";
 $DB->select($query, $participantstatus);
 if (PEAR::isError($participantstatus)) {
         PEAR::raiseError("Could not generate participant status history. " . $participantstatus->getMessage());
@@ -160,7 +169,7 @@ writeExcel($Test_name, $participantstatus, $dataDir);
 * Family History AD Other
 */
 $Test_name = "FamilyHistoryADOther";
-$query = "select PSCID, family_history_ad_other.CandID, family_member, parental_side, ad_dementia_age, living_age, death_age, death_cause, death_cause_status from family_history_ad_other join candidate on family_history_ad_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, family_history_ad_other.CandID, family_member, parental_side, ad_dementia_age, living_age, death_age, death_cause, death_cause_status from family_history_ad_other join candidate on family_history_ad_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $familyhistoryadother);
 if (PEAR::isError($familyhistoryadother)) {
         PEAR::raiseError("Could not generate family history ad other. " . $familyhistoryadother->getMessage());
@@ -170,7 +179,7 @@ writeExcel($Test_name, $familyhistoryadother, $dataDir);
 * Family History First Degree
 */
 $Test_name = "FamilyHistoryFirstDegree";
-$query = "select PSCID, family_history_first_degree.CandID, family_member, living_age, death_age, death_cause, death_cause_status, ad_dementia, ad_dementia_age, diagnosis_history, diagnosis_history_status from family_history_first_degree join candidate on family_history_first_degree.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, family_history_first_degree.CandID, family_member, living_age, death_age, death_cause, death_cause_status, ad_dementia, ad_dementia_age, diagnosis_history, diagnosis_history_status from family_history_first_degree join candidate on family_history_first_degree.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $familyhistoryfirstdegree);
 if (PEAR::isError($familyhistoryfirstdegree)) {
         PEAR::raiseError("Could not generate family history first degree. " . $familyhistoryfirstdegree->getMessage());
@@ -180,7 +189,7 @@ writeExcel($Test_name, $familyhistoryfirstdegree, $dataDir);
 * Family History Memory Problem Other
 */
 $Test_name = "FamilyHistoryMemoryProblemOther";
-$query = "select PSCID, family_history_memory_problem_other.CandID, family_member, parental_side, other_memory_problems, other_memory_problems_status, living_age, death_age, death_cause, death_cause_status from family_history_memory_problem_other join candidate on family_history_memory_problem_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, family_history_memory_problem_other.CandID, family_member, parental_side, other_memory_problems, other_memory_problems_status, living_age, death_age, death_cause, death_cause_status from family_history_memory_problem_other join candidate on family_history_memory_problem_other.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $familyhistorymemoryproblemother);
 if (PEAR::isError($familyhistorymemoryproblemother)) {
         PEAR::raiseError("Could not generate family history memory problem other. " . $familyhistorymemoryproblemother->getMessage());
@@ -191,7 +200,7 @@ writeExcel($Test_name, $familyhistorymemoryproblemother, $dataDir);
 * Family Information
 */
 $Test_name = "FamilyInformation";
-$query = "select PSCID, family_information.CandID, entry_staff, related_participant_PSCID, related_participant_CandID, related_participant_status_degree, related_participant_status, related_participant_status_specify from family_information join candidate on family_information.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, family_information.CandID, entry_staff, related_participant_PSCID, related_participant_CandID, related_participant_status_degree, related_participant_status, related_participant_status_specify from family_information join candidate on family_information.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $familyinformation);
 if (PEAR::isError($familyinformation)) {
         PEAR::raiseError("Could not generate family information. " . $familyinformation->getMessage());
@@ -202,7 +211,7 @@ writeExcel($Test_name, $familyinformation, $dataDir);
 * Drug Compliance
 */
 $Test_name = "DrugCompliance";
-$query = "select PSCID, drug_compliance.CandID, entry_staff, drug, visit_label, drug_issued_date, drug_issued_date_status, pills_issued, pills_issued_status, drug_returned_date, drug_returned_date_status, pills_returned, pills_returned_status, compliance_evaluation, compliance_evaluation_status, behavioral_compliance_evaluation, behavioral_compliance_evaluation_status, comments, comments_status from drug_compliance join candidate on drug_compliance.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, drug_compliance.CandID, entry_staff, drug, visit_label, drug_issued_date, drug_issued_date_status, pills_issued, pills_issued_status, drug_returned_date, drug_returned_date_status, pills_returned, pills_returned_status, compliance_evaluation, compliance_evaluation_status, behavioral_compliance_evaluation, behavioral_compliance_evaluation_status, comments, comments_status from drug_compliance join candidate on drug_compliance.CandID=candidate.CandID where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $drugcompliance);
 if (PEAR::isError($drugcompliance)) {
         PEAR::raiseError("Could not generate drug compliance. " . $drugcompliance->getMessage());
@@ -213,7 +222,7 @@ writeExcel($Test_name, $drugcompliance, $dataDir);
 * Treatment Duration
 */
 $Test_name = "TreatmentDuration";
-$query = "select PSCID, td.CandID, td.Trial, td.treatment_duration from treatment_duration td join candidate using (CandID) where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' order by PSCID";
+$query = "select PSCID, td.CandID, td.Trial, td.treatment_duration from treatment_duration td join candidate using (CandID) where PSCID not like '%MTL999%' and PSCID not like 'MTL0000' " . $wherenofailnowhere . " order by PSCID";
 $DB->select($query, $treatmentduration);
 if (PEAR::isError($treatmentduration)) {
         PEAR::raiseError("Could not generate treatment duration. " . $treatmentduration->getMessage());
