@@ -16,23 +16,26 @@ require_once "generic_includes.php";
 require_once "Archive/Tar.php";
 require_once "CouchDB_MRI_Importer.php";
 
-if (isset($argv[1])) {
-    $limit_date_instruments = " AND i.Date_taken <= '{$argv[1]}' ";
-    $limit_date = " AND mad.AcquisitionDate <= '{$argv[1]}' ";
-    $limit_date_candidates = " AND s.Date_visit <= '{$argv[1]}' ";
-} else {
-    $limit_date_instruments = "";
-    $limit_date = "";
-    $limit_date_candidates = "";
-}
-if (isset($argv[2]) && $argv[2] == 'nofail') {
-    $nofail = " AND s.Visit!='Failure' ";
-    $wherenofail = " WHERE candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
-    $wherenofailnowhere = " AND candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
-} else {
-    $nofail = "";
-    $wherenofail = "";
-    $wherenofailnowhere = "";
+$limit_date_instruments = "";
+$limit_date = "";
+$limit_date_candidates = "";
+$nofail = "";
+$wherenofail = "";
+$wherenofailnowhere = "";
+
+if (!empty($argv)) {
+    foreach ($argv as $arg) {
+        list($y, $m, $d) = explode("-", $arg);
+        if ($arg == 'nofail') {
+            $nofail = " AND s.Visit!='Failure' ";
+            $wherenofail = " WHERE candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
+            $wherenofailnowhere = " AND candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
+        } elseif (checkdate($m, $d, $y)) {
+            $limit_date_instruments = " AND i.Date_taken <= '{$arg}' ";
+            $limit_date = " AND mad.AcquisitionDate <= '{$arg}' ";
+            $limit_date_candidates = " AND s.Date_visit <= '{$arg}' ";
+        }
+    }
 }
 
 //Configuration variables for this script, possibly installation dependent.
