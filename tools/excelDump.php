@@ -16,6 +16,7 @@ require_once "generic_includes.php";
 require_once "Archive/Tar.php";
 require_once "CouchDB_MRI_Importer.php";
 
+//Default values
 $limit_date_instruments = "";
 $limit_date = "";
 $limit_date_candidates = "";
@@ -23,6 +24,7 @@ $nofail = "";
 $wherenofail = "";
 $wherenofailnowhere = "";
 
+//Handling arguments passed in
 if (!empty($argv)) {
     foreach ($argv as $arg) {
         list($y, $m, $d) = explode("-", $arg);
