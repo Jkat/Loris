@@ -2,7 +2,8 @@
 
 // Dumps the database instruments and some accompanying information into Excel formatted files.
 // Takes an optional date argument in the format YYYY-MM-DD to limit the SQL queries
-// eg. php excelDump.php 2015-12-25
+// Add 'nofail' to exclude Visits that are marked with 'Failure'
+// eg. php excelDump.php 2015-12-25 nofail
 // For some large tables, this script requires *a lot* of memory.  Modify the `cli` php.ini for > 256M
 
 // Operation:
