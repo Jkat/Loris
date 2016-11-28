@@ -25,14 +25,21 @@ $nofail = "";
 $wherenofail = "";
 $wherenofailnowhere = "";
 
+$no1 = " AND s.Visit!='Failure' AND s.Visit_label NOT LIKE 'POI%' ";
+$no2 = " WHERE candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE (session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") OR (session.Visit_label LIKE 'POI%')) ";
+$no3 = " AND candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE (session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") OR (session.Visit_label LIKE 'POI%')) ";
+
 //Handling arguments passed in
 if (!empty($argv)) {
     foreach ($argv as $arg) {
         list($y, $m, $d) = explode("-", $arg);
         if ($arg == 'nofail') {
             $nofail = " AND s.Visit!='Failure' ";
+//$nofail = $no1;
             $wherenofail = " WHERE candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
+//$wherenofail = $no2;
             $wherenofailnowhere = " AND candidate.CandID NOT IN (SELECT CandID FROM session JOIN candidate USING (CandID) WHERE session.Visit='Failure' AND session.Visit_label LIKE "%EL00%") ";
+//$wherenofailnowhere = $no3;
         } elseif (checkdate($m, $d, $y)) {
             $limit_date_instruments = " AND i.Date_taken <= '{$arg}' ";
             $limit_date = " AND mad.AcquisitionDate <= '{$arg}' ";
